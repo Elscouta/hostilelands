@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<items>
+    <file>
+        <path>icons/mapdrawable.png</path>
+        
+        <item identifier="party">
+            <position>
+                <x>0</x>
+                <y>0</y>
+                <w>25</w>
+                <h>40</h>
+            </position>
+            <offset>
+                <x>-12</x>
+                <y>-28</y>
+            </offset>
+        </item>
+        <item identifier="move_marker">
+            <position>
+                <x>20</x>
+                <y>0</y>
+                <w>32</w>
+                <h>32</h>
+            </position>
+            <offset>
+                <x>-16</x>
+                <y>-16</y>
+            </offset>
+        </item>
+    </file>
+    
+    <file>
+        <path>icons/mapdrawable.png</path>
+        <position>
+            <w>32</w>
+            <h>32</h>
+        </position>
+        <offset>
+            <x>-16</x>
+            <y>-16</y>
+        </offset>
+
+        <item identifier="skeleton">
+            <position>
+                <x>576</x>
+                <y>306</y>
+            </position>
+        </item>
+  
+        <item identifier="tomb">
+            <position>
+                <x>352</x>
+                <y>434</y>
+            </position>
+        </item>
+    </file>
+    
+    <file>
+        <path>icons/buildings-anna.png</path>
+        <position>
+            <w>36</w>
+            <h>36</h>
+        </position>
+        <offset>
+            <x>-18</x>
+            <y>-18</y>
+        </offset>
+        
+        <item identifier="town">
+            <position>
+                <x>300</x>
+                <y>4</y>
+            </position>
+        </item>
+    </file>
+</items>

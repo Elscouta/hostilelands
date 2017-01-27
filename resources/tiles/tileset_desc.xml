@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<items>
+    <path>tiles/tileset.png</path>
+
+    <item identifier="grass">  
+            <position>
+                <x>32</x>
+                <y>352</y>
+            </position>            
+    </item>
+
+    <item identifier="forest">
+            <position>
+                <x>192</x>
+                <y>352</y>
+            </position>
+    </item>
+
+    <item identifier="road">
+            <position>
+                <x>32</x>
+                <y>160</y>
+            </position>
+    </item>
+
+    <item identifier="water">
+            <position>
+                <x>576</x>
+                <y>160</y>
+            </position>
+    </item>
+
+    <item identifier="sea">
+            <position>
+                <x>576</x>
+                <y>160</y>
+            </position>
+    </item>
+</items>

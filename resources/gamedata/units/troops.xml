@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<troops>
+    <troop identifier="basic">
+        <icon>skeleton</icon>
+        <unit>skeleton</unit>
+        <unit>skeleton</unit>
+        <condition if-lvl-lt="3">
+            <unit>skeleton</unit>
+        </condition>
+        <condition if-lvl-gt="5">
+            <unit>skeleton</unit>
+        </condition>
+    </troop>
+</troops>

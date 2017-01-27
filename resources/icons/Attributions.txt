@@ -1,0 +1,11 @@
+1. Symbols
+
+bow: http://game-icons.net/lorc/originals/high-shot.html
+sword: http://game-icons.net/lorc/originals/broadsword.html
+shield: http://game-icons.net/lorc/originals/checked-shield.html
+speed: http://game-icons.net/lorc/originals/sprint.html
+flag: http://game-icons.net/lorc/originals/flying-flag.html
+
+2. Building Tiles from Anna Shlyapnikova (buildings-anna.png)
+
+source: http://shlyapnikova.deviantart.com/

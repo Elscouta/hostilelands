@@ -1,0 +1,103 @@
+<?xml version="1.0"?>
+<dices>
+  <dice identifier="fireball">
+    <face>
+        <sword />
+        <sword />
+    </face>
+    <face>
+        <sword />
+        <sword />
+    </face>
+    <face>
+        <sword />
+        <flag />
+    </face>
+    <face>
+        <flag />
+        <flag />
+    </face>
+    <face>
+        <sword />
+    </face>
+    <face>
+        <sword />
+    </face>
+  </dice>
+
+  <dice identifier="longsword">
+    <face>
+        <sword />
+        <sword />
+        <sword if-lvl-gt="3" />
+        <sword if-lvl-gt="13" />
+    </face>
+    <face>
+        <sword />
+        <sword />
+        <sword if-lvl-gt="7" />
+    </face>
+    <face>
+        <sword />
+        <shield />
+        <sword if-lvl-gt="11" />
+    </face>
+    <face>
+        <sword />
+        <sword if-lvl-gt="5" />
+    </face>
+    <face>
+        <sword />
+        <shield if-lvl-gt="9" />
+    </face>    
+    <face>
+        <sword />
+        <sword if-lvl-gt="15" />
+    </face>
+  </dice>
+
+  <dice identifier="shield">
+    <face><shield /><shield /></face>
+    <face><shield /><shield /></face>
+    <face><shield /></face>
+    <face><shield /></face>
+    <face><shield /></face>
+    <face></face>
+  </dice>
+  
+  <dice identifier="deadlyaim">
+      <face><bow /><bow /><bow /></face>
+      <face><bow /><bow /><flag /></face>
+      <face><bow /><flag /></face>
+      <face><bow /></face>
+      <face><bow /></face>
+      <face></face>
+  </dice>
+  
+  <dice identifier="coverfire">
+      <face><bow /><shield /><shield /></face>
+      <face><bow /><shield /></face>
+      <face><bow /><shield /></face>
+      <face><shield /></face>
+      <face><shield /></face>
+      <face><bow /></face>
+  </dice>
+  
+  <dice identifier="quickness">
+      <face><speed /><speed /><bow /></face>
+      <face><speed /><speed /></face>
+      <face><speed /><sword /></face>
+      <face><speed /><shield /></face>
+      <face><speed /><bow /></face>
+      <face><speed /></face>
+  </dice>
+  
+  <dice identifier="foxstance">
+      <face><speed /><sword /><sword /></face>
+      <face><speed /><sword /></face>
+      <face><sword /><sword /></face>
+      <face><sword /><sword /></face>
+      <face><sword /></face>
+      <face></face>
+  </dice>
+</dices>

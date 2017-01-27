@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<units>
+  <unit identifier="skeleton">
+    <portrait>resources/portraits/skeleton.png</portrait>
+    <dice>longsword</dice>
+    <dice>shield</dice>
+  </unit>
+</units>

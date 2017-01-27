@@ -1,0 +1,43 @@
+<?xml version="1.0" ?>
+<abilities>
+  <ability identifier="fireball">
+    <name>Fireball</name>
+    <dice>fireball</dice>
+  </ability>
+  <ability identifier="strike">
+    <name>Strike</name>
+    <dice>longsword</dice>
+  </ability>
+  <ability identifier="deadly-aim">
+      <name>Deadly Aim</name>
+      <dice>deadlyaim</dice>
+  </ability>
+  <ability identifier="rain-of-arrows">
+      <name>Rain of Arrows</name>
+      <dice>deadlyaim</dice>
+  </ability>
+  <ability identifier="covering-fire">
+      <name>Covering Fire</name>
+      <dice>coverfire</dice>
+  </ability>
+  <ability identifier="quickness">
+      <name>Quickness</name>
+      <dice>quickness</dice>
+  </ability>
+  <ability identifier="fox-stance">
+      <name>Fox Stance</name>
+      <dice>foxstance</dice>
+  </ability>
+  <ability identifier="lightning-bolt">
+      <name>Lightning Bolt</name>
+      <dice>fireball</dice>
+  </ability>
+  <ability identifier="lightning-storm">
+      <name>Lightning Storm</name>
+      <dice>coverfire</dice>
+  </ability>
+  <ability identifier="bloodlust">
+      <name>Bloodlust</name>
+      <dice>quickness</dice>
+  </ability>
+</abilities>

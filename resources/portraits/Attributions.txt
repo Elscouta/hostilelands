@@ -1,0 +1,7 @@
+skeleton: https://commons.wikimedia.org/wiki/File:Vincent_van_Gogh_-_Head_of_a_Skeleton_with_a_Burning_Cigarette_-_VGM_F212.jpg
+goblin: https://upload.wikimedia.org/wikipedia/commons/e/e1/Goblin_by_armandeo64.jpg
+
+--
+
+sintel: https://commons.wikimedia.org/wiki/File:Character_Sintel-portrait-old.png
+chaman: https://upload.wikimedia.org/wikipedia/commons/a/a8/Character_Shaman-portrait.png

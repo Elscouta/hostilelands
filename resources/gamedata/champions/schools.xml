@@ -1,0 +1,70 @@
+<?xml version="1.0" ?>
+<schools>
+  <school identifier="ranger">
+    
+    <name>Ranger</name>
+    
+    <slot category="ability">
+      <name>Dice Skill</name>
+      <type>ranged-dice</type>      
+    </slot>
+    <slot category="ability">
+      <name>Passive Skill</name>
+      <type>ranged-passive</type>
+    </slot>
+    <slot category="ability">
+      <name>Passive Skill</name>
+      <type>ranged-passive</type>
+    </slot>
+    
+    <ability>deadly-aim</ability>
+    <ability>rain-of-arrows</ability>
+    <ability>covering-fire</ability>
+    <ability>quickness</ability>
+    <ability>fox-stance</ability>
+    
+  </school>
+  <school identifier="mage">
+
+    <name>Magic!</name>
+
+    <slot category="ability">
+      <name>Dice Skill</name>
+      <type>spell-dice</type>
+    </slot>
+    <slot category="ability">
+      <name>Dice Skill</name>
+      <type>spell-dice</type>
+    </slot>
+    <slot category="ability">
+      <name>Dice Skill</name>
+      <type>spell-dice</type>
+    </slot>
+
+    <ability>fireball</ability>
+
+  </school>
+  <school identifier="chaman">
+
+    <name>Chaman</name>
+
+    <slot category="ability">
+      <name>Dice Skill</name>
+      <type>attack-dice</type>
+    </slot>
+    <slot category="ability">
+      <name>Dice Skill</name>
+      <type>attack-dice</type>
+    </slot>
+    <slot category="ability">
+      <name>Passive</name>
+      <type>passive</type>
+    </slot>
+
+    <ability>strike</ability>
+    <ability>lightning-bolt</ability>
+    <ability>lightning-storm</ability>
+    <ability>bloodlust</ability>
+
+  </school>
+</schools>

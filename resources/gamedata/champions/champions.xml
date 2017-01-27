@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<champions>
+  <champion identifier="sintel">
+    <name>Sintel</name>
+    <portrait>resources/portraits/sintel.png</portrait>
+    <ability>strike</ability>
+    <class>ranger</class>
+  </champion>
+  <champion identifier="chaman">
+    <name>Chaman</name>
+    <portrait>resources/portraits/chaman.png</portrait>
+    <ability>fireball</ability>
+    <class>chaman</class>
+  </champion>
+</champions>
