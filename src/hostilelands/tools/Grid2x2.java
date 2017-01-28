@@ -183,9 +183,46 @@ public class Grid2x2 <T>
             return u4;
     }
     
-    public <U extends Combinable<U>> U funcAtPosition(Function<T, BiFunction<Integer, Integer, U>> f,
+    /**
+     * A function that requires one of the object stored in the grid
+     * with a set of coordinates. To be used by funcAtPosition.
+     * @param <T> The type stored in the Grid2x2
+     * @param <U> The type returned by the function.
+     */
+    @FunctionalInterface
+    public static interface PositionedFunc<T, U>
+    {
+        public U apply(T t, int x, int y);
+    }
+    
+    /**
+     * Applies a function on one (or more childs) based on provided 
+     * coordinates. The grid is considered to represent a size x size square,
+     * the childs corresponding to the four quarter. The function is applied
+     * to the child that corresponds to the coordinates, and provided with a
+     * new set of coordinates, relative to the child itself.
+     * 
+     * If the coordinates fall on the border between two childs, the function
+     * is applied on both childs, then the results are combined.
+     * 
+     * @param <U> The return type of the function that should be applied
+     * @param f A function that takes a T-object and coordinates referring
+     * to that object, and that returns a U object.
+     * @param c A way to combine two elements of type U.
+     * @param size The size of the square that the grid is supposed to 
+     * represent
+     * @param x The x coordinate, related to the full square.
+     * @param y The y coordinate, related to the full square.
+     * @param middleBehavior What to do if we hit a border (-1 = apply only on 
+     * left/top child, +1 = apply only on right/bottom child, 0 = apply on 
+     * both)
+     * @return The result of the applied function, possibly after combines.
+     * @throws hostilelands.tools.CombineFunc.CombineFailure It was impossible
+     * to merge two of the returned objects together.
+     */
+    public <U> U funcAtPosition(PositionedFunc<T, U> f, CombineFunc<U> c,
                                 int size, int x, int y, int middleBehavior)
-            throws Combinable.CombineFailure
+            throws CombineFunc.CombineFailure
     {
         assert(x >= 0 && y >= 0 && x <= size && y <= size);
         assert(size > 0);
@@ -195,23 +232,21 @@ public class Grid2x2 <T>
         if (2 * x > size || middleBehavior >= 0 && 2 * x == size)
         {
             if (2 * y > size || middleBehavior >= 0 && 2 * y == size)
-                u = f.apply(southeast).apply(x - size/2, y - size/2).combine(u);                
+                u = c.combine(f.apply(southeast, x - size/2, y - size/2), u);                
 
             if (2 * y < size || middleBehavior <= 0 && 2 * y == size)
-                u = f.apply(northeast).apply(x - size/2, y).combine(u);
+                u = c.combine(f.apply(northeast, x - size/2, y), u);
         }
 
         if (2 * x < size || middleBehavior <= 0 && x == size / 2)
         {
             if (2 * y < size || middleBehavior <= 0 && 2 * y == size)
-                u = f.apply(northwest).apply(x, y).combine(u);
+                u = c.combine(f.apply(northwest, x, y), u);
 
             if (2 * y > size || middleBehavior >= 0 && 2 * y == size)
-                u = f.apply(southwest).apply(x, y - size/2).combine(u);
+                u = c.combine(f.apply(southwest, x, y - size/2), u);
         }
-        
-        assert(u != null);
-        
+                
         return u;
     }
 }

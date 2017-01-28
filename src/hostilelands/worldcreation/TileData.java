@@ -7,13 +7,13 @@ package hostilelands.worldcreation;
 
 import hostilelands.MapLocation;
 import hostilelands.TerrainType;
-import hostilelands.tools.Combinable;
+import hostilelands.tools.CombineFunc;
 
 /**
  *
  * @author Elscouta
  */
-public class TileData implements Combinable<TileData>
+public class TileData
 {
     private TerrainType terrain;
     private MapLocation location;
@@ -46,26 +46,19 @@ public class TileData implements Combinable<TileData>
         return location;
     }
     
-    @Override
-    public TileData combine(TileData o)
-            throws Combinable.CombineFailure
+    public static TileData combine(TileData o1, TileData o2)
+            throws CombineFunc.CombineFailure
     {
-        if (o == null)
-            return this;
+        if (o1 == null)
+            return o2;
         
-        if (this.terrain != null && o.terrain != null && 
-            this.terrain.equals(o.terrain) == false)
-            throw new Combinable.CombineFailure();
+        if (o2 == null)
+            return o1;
         
-        if (this.location != null && o.location != null)
-            throw new Combinable.CombineFailure();
+        TileData o = new TileData();
+        o.terrain = CombineFunc.combineNullOrEqual(o1.terrain, o2.terrain);
+        o.location = CombineFunc.combineNull(o1.location, o2.location);
         
-        if (this.terrain == null)
-            this.terrain = o.terrain;
-        
-        if (this.location == null)
-            this.location = o.location;
-        
-        return this;
+        return o;
     }
 }
