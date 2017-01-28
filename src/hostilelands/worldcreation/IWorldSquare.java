@@ -6,6 +6,7 @@
 package hostilelands.worldcreation;
 
 import hostilelands.World;
+import hostilelands.WorldSquare;
 import hostilelands.tools.Grid2x2;
 import hostilelands.tools.Grid3x3;
 
@@ -20,5 +21,6 @@ public interface IWorldSquare
     Grid2x2<IWorldSquare> getChilds();
     TileData getTile(int x, int y);
     TileDataSummary getSummary();
+    void postProcess(int cx, int cy, WorldSquare ws, int x, int y);
     void addObject(CreationObject obj);
 }

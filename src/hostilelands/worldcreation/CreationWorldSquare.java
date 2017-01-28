@@ -6,11 +6,13 @@
 package hostilelands.worldcreation;
 
 import hostilelands.World;
+import hostilelands.WorldSquare;
 import hostilelands.tools.CardinalMap;
 import hostilelands.tools.Combinable;
 import hostilelands.tools.Grid2x2;
 import hostilelands.tools.Grid3x3;
 import hostilelands.tools.Pair;
+import hostilelands.tools.Void;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,7 +21,7 @@ import java.util.stream.Collectors;
  *
  * @author Elscouta
  */
-public class WorldSquare implements IWorldSquare
+public class CreationWorldSquare implements IWorldSquare
 {
     final int size;
     
@@ -29,7 +31,7 @@ public class WorldSquare implements IWorldSquare
     boolean generated;
     TileDataSummary summary;        
     
-    public WorldSquare(int size)
+    public CreationWorldSquare(int size)
     {
         this.size = size;
         this.objects = new ArrayList<>();
@@ -66,7 +68,7 @@ public class WorldSquare implements IWorldSquare
     private IWorldSquare createEmptyQuarter()
     {
         if (size > 1)
-            return new WorldSquare(size / 2);
+            return new CreationWorldSquare(size / 2);
         else
             return new World1x1Square();                
     }
@@ -129,5 +131,15 @@ public class WorldSquare implements IWorldSquare
             summary = obj.fillTileDataSummary(summary);
         
         return summary;
+    }
+    
+    @Override
+    public void postProcess(int cx, int cy, WorldSquare square, int x, int y)
+    {
+        try {
+            childs.funcAtPosition(o -> (ox, oy) -> { o.postProcess(ox, oy, square, x, y); return Void.o; }, size, cx, cy, 0 );
+        } catch (Combinable.CombineFailure e) {
+            assert(false);
+        }
     }
 }

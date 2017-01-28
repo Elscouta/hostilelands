@@ -5,12 +5,10 @@
  */
 package hostilelands;
 
-import hostilelands.desc.LairDesc;
 import java.util.ArrayList;
 import java.util.List;
 
 import hostilelands.models.ChangeEventAggregate;
-import hostilelands.worldcreation.CreationLandmass;
 import hostilelands.worldcreation.TileData;
 
 /**
@@ -36,9 +34,9 @@ public class WorldSquare extends ChangeEventAggregate implements ShortTimeEntity
     MainParty party;
     
     public WorldSquare(Game game, ShortTimeMgr shortTimeMgr, int mapOrigX, int mapOrigY, 
-                       hostilelands.worldcreation.WorldSquare generator)
+                       hostilelands.worldcreation.CreationWorldSquare generator)
     {
-        this.tiles = new TerrainType[32][32];
+        this.tiles = new TerrainType[Settings.MAPSQUARE_SIZE][Settings.MAPSQUARE_SIZE];
         this.shortTimeMgr = shortTimeMgr;
         this.game = game;
         this.party = null;
@@ -48,26 +46,37 @@ public class WorldSquare extends ChangeEventAggregate implements ShortTimeEntity
         this.entities = new ArrayList<>();
         this.colliding_entities = new ArrayList<>();        
         
-        for (int x = 0; x < 32; x++)
+        for (int x = 0; x < Settings.MAPSQUARE_SIZE; x++)
         {
-            for (int y = 0; y < 32; y++)
+            for (int y = 0; y < Settings.MAPSQUARE_SIZE; y++)
             {
                 TileData data = generator.getTile(mapOrigX + x, mapOrigY + y);
                 tiles[x][y] = data.getTerrainType();
                 if (data.getLocation() != null)
                     addEntity(data.getLocation(), x, y);
+                generator.postProcess(mapOrigX + x, mapOrigY + y, this, x, y);
             }
         }               
     }
     
     public int getWidth()
     {
-        return 32;
+        return Settings.MAPSQUARE_SIZE;
     }
     
     public int getHeight()
     {
-        return 32;
+        return Settings.MAPSQUARE_SIZE;
+    }
+    
+    public int toWorldX(int squareX)
+    {
+        return mapOrigX + squareX;
+    }
+    
+    public int toWorldY(int squareY)
+    {
+        return mapOrigY + squareY;
     }
     
     public TerrainType getTile(int x, int y)

@@ -14,5 +14,5 @@ public class Void implements Combinable<Void>
     public static Void o = new Void();
     private Void() {}
     
-    @Override public Void combine(Void o) { return o; }
+    @Override public Void combine(Void other) { return o; }
 }

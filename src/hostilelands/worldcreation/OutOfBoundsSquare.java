@@ -6,6 +6,7 @@
 package hostilelands.worldcreation;
 
 import hostilelands.TerrainType;
+import hostilelands.WorldSquare;
 import hostilelands.tools.CardinalMap;
 import hostilelands.tools.Grid2x2;
 import hostilelands.tools.Grid3x3;
@@ -48,6 +49,12 @@ public class OutOfBoundsSquare implements IWorldSquare
     public TileData getTile(int x, int y) 
     {
         throw new UnsupportedOperationException("Should not request out of bounds tiles."); 
+    }
+    
+    @Override
+    public void postProcess(int cx, int cy, WorldSquare ws, int x, int y)
+    {
+        throw new UnsupportedOperationException("Should not request out of bounds tiles.");         
     }
 
     @Override

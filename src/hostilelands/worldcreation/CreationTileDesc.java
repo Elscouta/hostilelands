@@ -18,19 +18,25 @@ import javax.xml.xpath.XPathExpressionException;
 import org.w3c.dom.Element;
 
 /**
- *
+ * The specification of the way to create a location in the world.
+ * @param <T> The exact type of the location to create
  * @author Elscouta
  */
-public class CreationTileDesc 
+public class CreationTileDesc<T extends MapLocation>
 {
-    private final Supplier<MapLocation> location;
+    private final Supplier<T> location;
     private boolean strictCreation;
     private Map<TerrainType, Double> preferedTerrains;
     private List<TerrainType> allowedTerrains;
     private final String repulsionCategory;
     private int repulsionDistance;
     
-    public CreationTileDesc(Supplier<MapLocation> location, String category)
+    /**
+     * Creates a new specification.
+     * @param location A factory able to create the new location
+     * @param category A string representing the category of the location
+     */
+    public CreationTileDesc(Supplier<T> location, String category)
     {
         this.location = location;
         this.repulsionCategory = category;
@@ -112,7 +118,7 @@ public class CreationTileDesc
      * Returns the location associated to this creation.
      * @return the location being created
      */
-    public MapLocation getLocation()
+    public T getLocation()
     {
         return location.get();
     }

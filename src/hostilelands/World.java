@@ -37,8 +37,8 @@ public final class World
     
     public void generate()
     {
-        hostilelands.worldcreation.WorldSquare generator =
-                new hostilelands.worldcreation.WorldSquare(size*Settings.MAPSQUARE_SIZE);
+        hostilelands.worldcreation.CreationWorldSquare generator =
+                new hostilelands.worldcreation.CreationWorldSquare(size*Settings.MAPSQUARE_SIZE);
         generator.addObject(new CreationLandmass(size*Settings.MAPSQUARE_SIZE));
         generator.addObject(new CreationForests(size*Settings.MAPSQUARE_SIZE, 2*Settings.MAPSQUARE_SIZE, 30));
 

@@ -6,6 +6,7 @@
 package hostilelands.worldcreation;
 
 import hostilelands.TerrainType;
+import hostilelands.WorldSquare;
 import hostilelands.tools.CardinalMap;
 import hostilelands.tools.Grid2x2;
 import hostilelands.tools.Grid3x3;
@@ -48,5 +49,11 @@ public class CreationBasic implements CreationObject
     public boolean isAlive() 
     {
         return true;
-    }    
+    }
+
+    @Override
+    public void postProcess(WorldSquare sq, int x, int y)
+    {
+        
+    }
 }

@@ -6,6 +6,7 @@
 package hostilelands.worldcreation;
 
 import hostilelands.TerrainType;
+import hostilelands.WorldSquare;
 import hostilelands.tools.CardinalMap;
 import hostilelands.tools.Grid2x2;
 import hostilelands.tools.Grid3x3;
@@ -57,6 +58,13 @@ public class World1x1Square implements IWorldSquare
             summary.addLocation(data.getLocation());
         
         return summary;
+    }
+    
+    @Override
+    public void postProcess(int cx, int cy, WorldSquare sq, int x, int y)
+    {
+        for (CreationObject obj : objects)
+            obj.postProcess(sq, x, y);
     }
     
     @Override
