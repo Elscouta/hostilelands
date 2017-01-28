@@ -7,15 +7,11 @@ package hostilelands.worldcreation;
 
 import hostilelands.World;
 import hostilelands.WorldSquare;
-import hostilelands.tools.CardinalMap;
-import hostilelands.tools.Combinable;
 import hostilelands.tools.Grid2x2;
 import hostilelands.tools.Grid3x3;
-import hostilelands.tools.Pair;
-import hostilelands.tools.Void;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import hostilelands.tools.CombineFunc;
 
 /**
  *
@@ -112,8 +108,11 @@ public class CreationWorldSquare implements IWorldSquare
         assert(generated);
         
         try {
-            return childs.funcAtPosition(o -> (mx, my) -> o.getTile(mx, my), size, x, y, 0);
-        } catch (Combinable.CombineFailure e) {
+            return childs.funcAtPosition(
+                    (o, mx, my) -> o.getTile(mx, my), 
+                    TileData::combine,
+                    size, x, y, 0);
+        } catch (CombineFunc.CombineFailure e) {
             assert(false);
             return null;
         }
@@ -137,8 +136,12 @@ public class CreationWorldSquare implements IWorldSquare
     public void postProcess(int cx, int cy, WorldSquare square, int x, int y)
     {
         try {
-            childs.funcAtPosition(o -> (ox, oy) -> { o.postProcess(ox, oy, square, x, y); return Void.o; }, size, cx, cy, 0 );
-        } catch (Combinable.CombineFailure e) {
+            childs.funcAtPosition(
+                    (o, ox, oy) -> { o.postProcess(ox, oy, square, x, y); return true; },
+                    (a, b) -> { return true; },
+                    size, cx, cy, 0 
+            );
+        } catch (CombineFunc.CombineFailure e) {
             assert(false);
         }
     }
