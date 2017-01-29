@@ -48,11 +48,20 @@ public class Grid2x2 <T>
         this.southwest = o.southwest;
     }
     
+    public <U> Grid2x2<Pair<T, U>> pair(Grid2x2<U> o)
+    {
+        return new Grid2x2<>(
+                new Pair<>(southeast, o.southeast),
+                new Pair<>(northeast, o.northeast),
+                new Pair<>(northwest, o.northwest),
+                new Pair<>(southwest, o.southwest));
+    }
+
     public <U> Grid2x2<U> map(Function<T, U> f)
     {
         return mapMarked((type, t) -> f.apply(t));
     }
-    
+        
     public <U> Grid2x2<U> mapMarked(BiFunction<Integer, T, U> f)
     {
         return new Grid2x2<>(f.apply(SOUTHEAST, southeast), f.apply(NORTHEAST, northeast),

@@ -8,8 +8,6 @@ package hostilelands.worldcreation;
 import hostilelands.MapLocation;
 import hostilelands.Settings;
 import hostilelands.World;
-import hostilelands.WorldSquare;
-import hostilelands.tools.CardinalMap;
 import hostilelands.tools.Grid2x2;
 import hostilelands.tools.Grid3x3;
 
@@ -18,7 +16,7 @@ import hostilelands.tools.Grid3x3;
  * @param <T> The exact type of the location being created.
  * @author Elscouta
  */
-public class CreationTile<T extends MapLocation> implements CreationObject
+public class LocationPlacement<T extends MapLocation> extends AbstractPartialSquare
 {
     private final CreationTileDesc desc;
     private final T obj;
@@ -42,44 +40,47 @@ public class CreationTile<T extends MapLocation> implements CreationObject
     
     /**
      * Creates a new request for an object creation (that is limited to one tile)
+     * @param size
+     * @param origX
+     * @param origY
+     * @param neighbors
      * @param desc The specification of the object to be created
      * @param creationListener An interface to be used when the object is created.
      */
-    public CreationTile(CreationTileDesc<T> desc, Listener<T> creationListener)
+    private LocationPlacement(int size, int origX, int origY, 
+                              PartialSquare previousLayers,
+                              Grid3x3<SummarySource> neighbors,
+                              CreationTileDesc<T> desc, 
+                              Listener<T> creationListener)
     {
+        super(size, origX, origY, previousLayers, neighbors);
+        
         this.desc = desc;
         this.obj = desc.getLocation();
-        this.creationListener = creationListener;
+
+        if (creationListener != null)
+            this.creationListener = creationListener;
+        else
+            this.creationListener = (_obj, _x, _y) -> {};
     }
     
-    /**
-     * Creates a new request for an object creation, without specifying a 
-     * specific behavior when the object is created.
-     * @param desc The specification of the object to be created 
-     */
-    public CreationTile(CreationTileDesc<T> desc)
+    public static <T extends MapLocation> Factory<LocationPlacement<T>> 
+        getFactory(CreationTileDesc<T> desc, Listener<T> creationListener)
     {
-        this.desc = desc;
-        this.obj = desc.getLocation();
-        this.creationListener = 
-            (T l_obj, int l_x, int l_y) -> {};
+        return (size, origX, origY, previousLayers, neighbors) ->
+                new LocationPlacement(size, origX, origY, previousLayers, neighbors,
+                                      desc, creationListener);
     }
-    
+     
     @Override
-    public boolean isAlive()
-    {
-        return true;
-    }
-    
-    @Override
-    public Grid2x2<CreationObject> split(Grid2x2<IWorldSquare> childs,
-                                         Grid3x3<TileDataSummary> neighbors)
+    public Grid2x2<PartialSquare> generate()
             throws World.GenerationFailure
     {        
-        Grid2x2<TileDataSummary> childSummaries = childs.map(c -> c.getSummary());
-                
-        Grid2x2<Grid3x3<TileDataSummary>> hierSummaries = 
-                childSummaries.propagateNeighbors(neighbors);
+        Grid2x2<PartialSquareSummary> childSummaries = previousLayers.getChilds().map(c -> c.getSummary());
+        Grid3x3<PartialSquareSummary> neighborsSummaries = neighbors.map(c -> c.getSummary());
+        
+        Grid2x2<Grid3x3<PartialSquareSummary>> hierSummaries = 
+                childSummaries.propagateNeighbors(neighborsSummaries);
 
         Grid2x2<Double> childScores = 
                 hierSummaries.map(n -> desc.computeScore(n.o22, n));
@@ -93,33 +94,38 @@ public class CreationTile<T extends MapLocation> implements CreationObject
             else 
             {
                 System.err.printf("Unable to position object: %s!\n", desc.getIdentifier());
-                return new Grid2x2<CreationObject>();
+                return new Grid2x2<>();
             }
         }
         
-        Grid2x2<CreationObject> ret = 
-                childs.mapRandom(s -> this, s -> null, childScores);
+        Grid2x2<PartialSquare> candidates = createChilds((s, oX, oY, p, n) -> 
+                new LocationPlacement(s, oX, oY, p, n, desc, creationListener));
+
+        Grid2x2<PartialSquare> ret = 
+                candidates.mapRandom(s -> s, s -> null, childScores);
 
         return ret;
     }
     
     @Override
-    public TileData fillTileData(TileData data)
+    public PartialTileData getTileData()
     {
+        PartialTileData data = new PartialTileData();
         data.addLocation(obj);
         return data;
     }
     
     @Override
-    public TileDataSummary fillTileDataSummary(TileDataSummary summary)
+    public PartialSquareSummary getSummary()
     {
+        PartialSquareSummary summary = new PartialSquareSummary(size);
         summary.addLocation(obj);
         return summary;
     }
     
     @Override
-    public void postProcess(WorldSquare sq, int x, int y)
+    public void postProcess()
     {
-        creationListener.onCreation(obj, sq.toWorldX(x), sq.toWorldY(y));
+        creationListener.onCreation(obj, origX, origY);
     }
 }

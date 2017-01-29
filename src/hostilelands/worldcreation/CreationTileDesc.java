@@ -87,8 +87,8 @@ public class CreationTileDesc<T extends MapLocation>
      * @param neighbors Summaries of the square bordering that square.
      * @return The score of the square.
      */
-    public double computeScore(TileDataSummary summary, 
-                               Grid3x3<TileDataSummary> neighbors)
+    public double computeScore(PartialSquareSummary summary, 
+                               Grid3x3<PartialSquareSummary> neighbors)
     {
         assert(summary == neighbors.o22);
         double score = 100;

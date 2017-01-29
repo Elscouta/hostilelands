@@ -9,7 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import hostilelands.models.ChangeEventAggregate;
-import hostilelands.worldcreation.TileData;
+import hostilelands.worldcreation.PartialSquareRoot;
+import hostilelands.worldcreation.PartialTileData;
 
 /**
  * Represents the accurate simulation of a world square.
@@ -34,7 +35,7 @@ public class WorldSquare extends ChangeEventAggregate implements ShortTimeEntity
     MainParty party;
     
     public WorldSquare(Game game, ShortTimeMgr shortTimeMgr, int mapOrigX, int mapOrigY, 
-                       hostilelands.worldcreation.CreationWorldSquare generator)
+                       PartialSquareRoot generator)
     {
         this.tiles = new TerrainType[Settings.MAPSQUARE_SIZE][Settings.MAPSQUARE_SIZE];
         this.shortTimeMgr = shortTimeMgr;
@@ -50,11 +51,10 @@ public class WorldSquare extends ChangeEventAggregate implements ShortTimeEntity
         {
             for (int y = 0; y < Settings.MAPSQUARE_SIZE; y++)
             {
-                TileData data = generator.getTile(mapOrigX + x, mapOrigY + y);
+                PartialTileData data = generator.getTileData(mapOrigX + x, mapOrigY + y);
                 tiles[x][y] = data.getTerrainType();
                 if (data.getLocation() != null)
                     addEntity(data.getLocation(), x, y);
-                generator.postProcess(mapOrigX + x, mapOrigY + y, this, x, y);
             }
         }               
     }

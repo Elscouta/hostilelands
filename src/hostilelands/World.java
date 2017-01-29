@@ -5,15 +5,10 @@
  */
 package hostilelands;
 
-import hostilelands.tools.CardinalMap;
-import hostilelands.tools.Grid2x2;
-import hostilelands.tools.Grid3x3;
 import hostilelands.worldcreation.CreationForests;
 import hostilelands.worldcreation.CreationLandmass;
-import hostilelands.worldcreation.CreationTile;
+import hostilelands.worldcreation.LocationPlacement;
 import hostilelands.worldcreation.CreationTileDesc;
-import hostilelands.worldcreation.IWorldSquare;
-import hostilelands.worldcreation.OutOfBoundsSquare;
 
 
 /**
@@ -37,25 +32,23 @@ public final class World
     
     public void generate()
     {
-        hostilelands.worldcreation.CreationWorldSquare generator =
-                new hostilelands.worldcreation.CreationWorldSquare(size*Settings.MAPSQUARE_SIZE);
-        generator.addObject(new CreationLandmass(size*Settings.MAPSQUARE_SIZE));
-        generator.addObject(new CreationForests(size*Settings.MAPSQUARE_SIZE, 2*Settings.MAPSQUARE_SIZE, 30));
+        hostilelands.worldcreation.PartialSquareRoot generator =
+                new hostilelands.worldcreation.PartialSquareRoot(size*Settings.MAPSQUARE_SIZE);
+        generator.addObject(CreationLandmass.getFactory());
+        generator.addObject(CreationForests.getFactory(2*Settings.MAPSQUARE_SIZE, 30));
 
         CreationTileDesc hometownDesc = game.getDataStore().getTownDesc("hometown").getCreationDesc();
-        CreationTile hometownCreation = new CreationTile(hometownDesc);
-        generator.addObject(hometownCreation);
+        generator.addObject(LocationPlacement.getFactory(hometownDesc, null));
         
         CreationTileDesc creationTomb = game.getDataStore().getLairDesc("tomb").getCreationDesc();
-        generator.addObject(new CreationTile(creationTomb));
-        generator.addObject(new CreationTile(creationTomb));
-        generator.addObject(new CreationTile(creationTomb));
-        generator.addObject(new CreationTile(creationTomb));
-        generator.addObject(new CreationTile(creationTomb));
-        generator.addObject(new CreationTile(creationTomb));
-        generator.addObject(new CreationTile(creationTomb));
+        generator.addObject(LocationPlacement.getFactory(creationTomb, null));
+        generator.addObject(LocationPlacement.getFactory(creationTomb, null));
+        generator.addObject(LocationPlacement.getFactory(creationTomb, null));
+        generator.addObject(LocationPlacement.getFactory(creationTomb, null));
+        generator.addObject(LocationPlacement.getFactory(creationTomb, null));
+        generator.addObject(LocationPlacement.getFactory(creationTomb, null));
+        generator.addObject(LocationPlacement.getFactory(creationTomb, null));
 
-        generator.setNeighbors(new Grid3x3(generator, () -> new OutOfBoundsSquare(size*Settings.MAPSQUARE_SIZE)));
         generator.generate();
                 
         for (int i = 0; i < size; i++)
@@ -65,7 +58,9 @@ public final class World
                 map[i][j] = new WorldSquare(game, shortTimeMgr, i*Settings.MAPSQUARE_SIZE, j*Settings.MAPSQUARE_SIZE, generator);    
                 shortTimeMgr.addEntity(map[i][j]);
             } 
-        }        
+        }
+        
+        generator.postProcess();
     }
             
     public WorldSquare getSquare(int x, int y)

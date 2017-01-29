@@ -73,7 +73,7 @@ public final class Game
                 world.generate();
                 return;
             } catch (World.GenerationFailure e) {
-                System.err.printf("World generation failed (%s). Retrying... (attempt %d)", e, attempt);
+                System.err.printf("World generation failed (%s). Retrying... (attempt %d)\n", e, attempt);
             }
         }
     }

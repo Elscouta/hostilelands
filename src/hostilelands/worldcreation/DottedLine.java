@@ -526,6 +526,9 @@ public class DottedLine
         
         for (int i = 0; i < toggles.size(); i += 2)
             positives += (toggles.get(i+1) - toggles.get(i) + 1);
+        
+        if (toggles.size() > 0 && toggles.get(toggles.size()-1) == length)
+            positives--;
             
         return (double) positives / (double) length;
     }

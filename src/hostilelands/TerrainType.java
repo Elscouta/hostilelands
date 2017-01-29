@@ -5,6 +5,8 @@
  */
 package hostilelands;
 
+import java.util.function.Function;
+
 /**
  *
  * @author Elscouta
@@ -12,17 +14,10 @@ package hostilelands;
 public class TerrainType implements Identifiable
 {
     private final String identifier;
-    private final int priority;
     
-    private TerrainType(String identifier, int priority)
+    private TerrainType(String identifier)
     {
         this.identifier = identifier;
-        this.priority = priority;
-    }
-    
-    public boolean canOverwrite(TerrainType other)
-    {
-        return this.priority < other.priority;
     }
     
     @Override
@@ -53,9 +48,16 @@ public class TerrainType implements Identifiable
         return identifier.hashCode();
     }
     
-    public static final TerrainType SEA = new TerrainType("sea", 0);
-    public static final TerrainType GRASS = new TerrainType("grass", 200);
-    public static final TerrainType FOREST = new TerrainType("forest", 100);
-    public static final TerrainType MOUNTAIN = new TerrainType("mountain", 50);
-    public static final TerrainType ROAD = new TerrainType("road", 10);
+    @FunctionalInterface
+    public interface Transform extends Function<TerrainType, TerrainType>
+    {
+        @Override public TerrainType apply(TerrainType orig);
+    }
+    
+    public static final TerrainType NULL = new TerrainType("null");
+    public static final TerrainType SEA = new TerrainType("sea");
+    public static final TerrainType GRASS = new TerrainType("grass");
+    public static final TerrainType FOREST = new TerrainType("forest");
+    public static final TerrainType MOUNTAIN = new TerrainType("mountain");
+    public static final TerrainType ROAD = new TerrainType("road");
 }

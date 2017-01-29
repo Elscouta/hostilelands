@@ -6,69 +6,46 @@
 package hostilelands.worldcreation;
 
 import hostilelands.TerrainType;
-import hostilelands.WorldSquare;
-import hostilelands.tools.CardinalMap;
 import hostilelands.tools.Grid2x2;
-import hostilelands.tools.Grid3x3;
 
 /**
- *
+ * Represents a square that is out of bounds. Size doesn't matter, it just
+ * returns "full of sea" summaries.
+ * 
  * @author Elscouta
  */
-public class OutOfBoundsSquare implements IWorldSquare
+public class OutOfBoundsSquare implements SummarySource
 {
-    int size;
+    private final int size;
     
     public OutOfBoundsSquare(int size)
     {
         this.size = size;
     }
-
+    
     @Override
-    public void generate() 
+    public Grid2x2<SummarySource> getChilds()
     {
-        throw new UnsupportedOperationException("Should not generate out of bounds squares."); 
+        return Grid2x2.generate(() -> (new OutOfBoundsSquare(size / 2)));
     }
     
     @Override
-    public void setNeighbors(Grid3x3<IWorldSquare> neighbors)
+    public int getSize()
     {
-        throw new UnsupportedOperationException("Neighbors of outofbounds square should not be set");
-    }
-    
-    @Override
-    public Grid2x2<IWorldSquare> getChilds()
-    {
-        if (size == 1)
-            return null;
-        
-        return Grid2x2.generate(() -> new OutOfBoundsSquare(size / 2));
+        return size;
     }
 
     @Override
-    public TileData getTile(int x, int y) 
+    public PartialSquareSummary getSummary() 
     {
-        throw new UnsupportedOperationException("Should not request out of bounds tiles."); 
-    }
-    
-    @Override
-    public void postProcess(int cx, int cy, WorldSquare ws, int x, int y)
-    {
-        throw new UnsupportedOperationException("Should not request out of bounds tiles.");         
-    }
-
-    @Override
-    public TileDataSummary getSummary() 
-    {
-        TileDataSummary summary = new TileDataSummary(size);
+        PartialSquareSummary summary = new PartialSquareSummary(size);
         summary.addTerrainGuess(TerrainType.SEA, 1d, true);
         return summary;
     }
-
-    @Override
-    public void addObject(CreationObject obj) 
-    {
-        throw new UnsupportedOperationException("Should not add objects out of bounds."); 
-    }
     
+    @Override
+    public SummarySource getPreviousLayers()
+    {
+        return this;
+    }
 }

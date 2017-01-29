@@ -7,12 +7,9 @@ package hostilelands.worldcreation;
 
 import hostilelands.TerrainType;
 import hostilelands.tools.Grid2x2;
-import hostilelands.tools.Rectangle;
-import java.awt.geom.Line2D;
+import hostilelands.tools.Grid3x3;
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.function.Function;
 
 /**
@@ -24,38 +21,73 @@ public class CreationForests extends CreationArea
     /**
      * Defines a new forest to fit in the given size.
      * @param size the size of the global square
+     * @param origX
+     * @param origY
+     * @param previousLayers
+     * @param neighbors
      * @param threshold the average size of a forest
      * @param number an average number of forests to create
      */
-    public CreationForests(int size, int threshold, int number)
+    public CreationForests(int size, int origX, int origY,
+                           PartialSquare previousLayers,
+                           Grid3x3<SummarySource> neighbors,
+                           int threshold, int number)
     {
-        super(size, new SpawnInterpreter(size, threshold, number), new DottedSquare(size));
+        super(size, origX, origY, previousLayers, neighbors,
+              new SpawnInterpreter(size, threshold, number), 
+              new DottedSquare(size));
     }
     
-    private CreationForests(int size, DottedInterpreter interpreter, DottedSquare edgeConstraints)
+    private CreationForests(int size, int origX, int origY,
+                            PartialSquare previousLayers,
+                            Grid3x3<SummarySource> neighbors,
+                            DottedInterpreter interpreter, 
+                            DottedSquare edgeConstraints)
     {
-        super(size, interpreter, edgeConstraints);
+        super(size, origX, origY, previousLayers, neighbors, 
+                interpreter, 
+                edgeConstraints);
+    }
+    
+    public static Factory<CreationForests> getFactory(int threshold, int number)
+    {
+        return (size, origX, origY, previousLayers, neighbors) -> 
+                new CreationForests(size, origX, origY, previousLayers, neighbors,
+                                    threshold, number);
+    }
+        
+    @Override
+    protected CreationForests createChild(int size, int origX, int origY,
+                                          PartialSquare previousLayers,
+                                          Grid3x3<SummarySource> neighbors,
+                                          int quarter, DottedSquare childConstraints)
+    {
+        return new CreationForests(size, origX, origY, previousLayers, neighbors, 
+                                   interpreter.clip(quarter), childConstraints);
     }
     
     @Override
-    protected CreationForests createChild(int quarter, DottedSquare childConstraints)
+    public PartialTileData getTileData()
     {
-        return new CreationForests(size / 2, interpreter.clip(quarter), childConstraints);
-    }
-    
-    @Override
-    public TileData fillTileData(TileData data)
-    {
-        data.addTerrain(TerrainType.FOREST, false);
+        assert(size == 0);
+        
+        PartialTileData data = new PartialTileData();
+        data.setTerrain(TerrainType.FOREST, false);
         return data;
     }
     
     @Override
-    public TileDataSummary fillTileDataSummary(TileDataSummary summary)
+    public PartialSquareSummary getSummary()
     {
-        summary.addTerrainGuess(TerrainType.FOREST, 
-                interpreter.getExpectedRatio(edgeConstraints.getRatio()), 
-                false);
+        PartialSquareSummary summary = new PartialSquareSummary(size);
+        
+        if (size > 0)
+            summary.addTerrainGuess(TerrainType.FOREST, 
+                    interpreter.getExpectedRatio(edgeConstraints.getRatio()), 
+                    false);
+        else
+            summary.addTerrainGuess(TerrainType.FOREST, 1, false);
+        
         return summary;
     }
     

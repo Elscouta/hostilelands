@@ -6,12 +6,9 @@
 package hostilelands.worldcreation;
 
 import hostilelands.TerrainType;
-import hostilelands.tools.Rectangle;
-import java.awt.geom.Line2D;
+import hostilelands.tools.Grid3x3;
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.function.Function;
 
 /**
@@ -23,35 +20,66 @@ public class CreationLandmass extends CreationArea
     /**
      * Defines a new forest to fit in the given size.
      * @param size 
+     * @param origX
+     * @param origY
+     * @param neighbors
      */
-    public CreationLandmass(int size)
+    public CreationLandmass(int size, int origX, int origY,
+                            PartialSquare previousLayers,
+                            Grid3x3<SummarySource> neighbors)
     {
-        super(size, new SpawnInterpreter(size), new DottedSquare(size));
+        super(size, origX, origY, previousLayers, neighbors,
+              new CreationLandmass.SpawnInterpreter(size), 
+              new DottedSquare(size));
     }
     
-    private CreationLandmass(int size, DottedInterpreter interpreter, DottedSquare edgeConstraints)
+    private CreationLandmass(int size, int origX, int origY,
+                             PartialSquare previousLayers,
+                             Grid3x3<SummarySource> neighbors,
+                             DottedInterpreter interpreter, 
+                             DottedSquare edgeConstraints)
     {
-        super(size, interpreter, edgeConstraints);
+        super(size, origX, origY, previousLayers, neighbors, 
+              interpreter, edgeConstraints);
+    }
+    
+    public static Factory<CreationLandmass> getFactory()
+    {
+        return (size, origX, origY, previousLayers, neighbors) -> 
+                new CreationLandmass(size, origX, origY, previousLayers, neighbors);
     }
     
     @Override
-    protected CreationLandmass createChild(int quarter, DottedSquare childConstraints)
+    protected CreationLandmass createChild(int size, int origX, int origY,
+                                           PartialSquare previousLayers,
+                                           Grid3x3<SummarySource> neighbors,
+                                           int quarter, DottedSquare childConstraints)
     {
-        return new CreationLandmass(size / 2, interpreter.clip(quarter), childConstraints);
+        return new CreationLandmass(size, origX, origY, previousLayers, neighbors, 
+                                    interpreter.clip(quarter), childConstraints);
     }
     
     @Override
-    public TileData fillTileData(TileData data)
+    public PartialTileData getTileData()
     {
-        data.addTerrain(TerrainType.GRASS, true);
+        assert(size == 0);
+        
+        PartialTileData data = new PartialTileData();
+        data.setTerrain(TerrainType.GRASS, true);
         return data;
     }
     
     @Override
-    public TileDataSummary fillTileDataSummary(TileDataSummary summary)
+    public PartialSquareSummary getSummary()
     {
-        summary.addTerrainGuess(TerrainType.GRASS, 
-                interpreter.getExpectedRatio(edgeConstraints.getRatio()), true);
+        PartialSquareSummary summary = new PartialSquareSummary(size);
+        
+        if (size > 0)
+            summary.addTerrainGuess(TerrainType.GRASS, 
+                    interpreter.getExpectedRatio(edgeConstraints.getRatio()), 
+                    true);
+        else
+            summary.addTerrainGuess(TerrainType.GRASS, 1d, true);
         
         return summary;
     }

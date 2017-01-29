@@ -8,8 +8,8 @@ package hostilelands.worldcreation;
 import hostilelands.MapLocation;
 import hostilelands.Settings;
 import hostilelands.TerrainType;
+import hostilelands.tools.Distribution;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -17,16 +17,15 @@ import java.util.Map;
  *
  * @author Elscouta
  */
-public class TileDataSummary 
+public class PartialSquareSummary 
 {
-    private final Map<TerrainType, Double> terrains;
+    private Distribution<TerrainType.Transform> terrains;
     private final List<MapLocation> locations;
     private final int size;
     
-    public TileDataSummary(int size)
+    public PartialSquareSummary(int size)
     {
-        terrains = new HashMap<>();
-        terrains.put(TerrainType.SEA, 1d);
+        terrains = new Distribution<>(t -> t);
         locations = new ArrayList<>();
         this.size = size;
     }
@@ -41,6 +40,17 @@ public class TileDataSummary
         return size;
     }
     
+    public Distribution<TerrainType> getTerrains()
+    {
+        return terrains.map(f -> f.apply(TerrainType.NULL));
+    }
+    
+    public void overwrite(PartialSquareSummary other)
+    {
+        terrains = terrains.compose(other.terrains.map(f -> (g -> (x -> f.apply(g.apply(x))))));
+        locations.addAll(other.locations);
+    }
+    
     /**
      * Adds an expected ratio of terrain to the current summary.
      * @param type The type of the terrain added.
@@ -51,29 +61,25 @@ public class TileDataSummary
      */
     public void addTerrainGuess(TerrainType type, double ratio, boolean forceOverwrite)
     {
-        double addratio = 0;
-        for (Map.Entry<TerrainType, Double> e : terrains.entrySet())
+        assert (ratio > - Settings.FLOAT_PRECISION && 
+                ratio <= 1 + Settings.FLOAT_PRECISION);
+        PartialSquareSummary other = new PartialSquareSummary(size);
+        if (forceOverwrite)
         {
-            if (e.getKey().equals(type))
-                continue;
-            
-            if (!forceOverwrite && !type.canOverwrite(e.getKey()))
-                continue;
-            
-            double value = e.getValue();
-            terrains.put(e.getKey(), value * (1 - ratio));
-            addratio += ratio * value;
-        }
-
-        if (terrains.containsKey(type))
-        {
-            double oldratio = terrains.get(type);
-            terrains.put(type, oldratio + addratio);
+            other.terrains = Distribution.binaryChoice(ratio, 
+                    t -> type,
+                    t -> t 
+            ); 
         }
         else
         {
-            terrains.put(type, addratio);
-        }        
+            other.terrains = Distribution.binaryChoice(ratio,
+                    t -> t != TerrainType.SEA ? type : TerrainType.SEA,
+                    t -> t
+            );
+        }
+
+        overwrite(other);
     }
     
     /**
@@ -84,9 +90,11 @@ public class TileDataSummary
      */
     public double getTerrainScore(Map<TerrainType, Double> scores)
     {
+        Distribution<TerrainType> flattened = getTerrains();
+        
         return scores.entrySet()
                      .stream()
-                     .mapToDouble(e -> e.getValue() * terrains.getOrDefault(e.getKey(), 0d))
+                     .mapToDouble(e -> e.getValue() * flattened.get(e.getKey()))
                      .reduce((x, y) -> x + y)
                      .orElse(0);
     }
@@ -98,10 +106,12 @@ public class TileDataSummary
      */
     public boolean isTerrainPresent(TerrainType terrain)
     {
-        return terrains.entrySet()
-                       .stream()
-                       .map(e -> e.getKey().equals(terrain) && e.getValue() > Settings.FLOAT_PRECISION)
-                       .reduce(false, (x, y) -> x || y);
+        Distribution<TerrainType> flattened = getTerrains();
+
+        return flattened.entrySet()
+                        .stream()
+                        .map(e -> e.getKey().equals(terrain) && e.getValue() > Settings.FLOAT_PRECISION)
+                        .reduce(false, (x, y) -> x || y);
     }
     
     /**
@@ -115,6 +125,9 @@ public class TileDataSummary
     
     /**
      * Returns whether a location with the given key is present
+     * 
+     * @param trait
+     * @return 
      */
     public boolean isLocationWithTraitPresent(String trait)
     {

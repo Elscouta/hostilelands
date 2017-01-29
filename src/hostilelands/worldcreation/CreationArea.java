@@ -5,8 +5,6 @@
  */
 package hostilelands.worldcreation;
 
-import hostilelands.WorldSquare;
-import hostilelands.tools.CardinalMap;
 import hostilelands.tools.Grid2x2;
 import hostilelands.tools.Grid3x3;
 import hostilelands.tools.Intersectable;
@@ -16,30 +14,43 @@ import hostilelands.tools.Pair;
  *
  * @author Elscouta
  */
-public abstract class CreationArea implements CreationObject
+public abstract class CreationArea extends AbstractPartialSquare
 {
-    protected final int size;
     protected final DottedInterpreter interpreter;
     protected final DottedSquare edgeConstraints;
     
-    protected CreationArea(int size, DottedInterpreter interpreter, DottedSquare edgeConstraints)
+    protected CreationArea(int size, int origX, int origY, 
+                           PartialSquare previousLayers,
+                           Grid3x3<SummarySource> neighbors,
+                           DottedInterpreter interpreter, 
+                           DottedSquare edgeConstraints)
     {
-        this.size = size;
+        super(size, origX, origY, previousLayers, neighbors);
         this.interpreter = interpreter;
         this.edgeConstraints = edgeConstraints;
+        
+        assert(size == 0 || edgeConstraints != null);
+        assert(interpreter != null);
     }
     
     /**
      * Child classes must implement this method to provide a method to create
      * quarter childs
+     * @param size
+     * @param origX
+     * @param origY
+     * @param previousLayers
+     * @param neighbors
      * @param quarter The quarter being created (constants defined in Grid2x2)
      * @param childConstraints The edge constraints
      * @return The newly created child
      */
-    protected abstract CreationArea createChild(int quarter, DottedSquare childConstraints);
+    protected abstract CreationArea createChild(int size, int origX, int origY,
+                                                PartialSquare previousLayers,
+                                                Grid3x3<SummarySource> neighbors,
+                                                int quarter, DottedSquare childConstraints);
     
-    @Override
-    public boolean isAlive()
+    private boolean isAlive()
     {
         return !edgeConstraints.isEmpty() || !interpreter.deleteOnEmptyEdges();
     }
@@ -48,23 +59,25 @@ public abstract class CreationArea implements CreationObject
      * A very fast procedure for very small squares
      * @return A 2x2 grid of objects.
      */
-    public Grid2x2<CreationObject> split1x1()
+    public Grid2x2<PartialSquare> generate1x1()
     {
-        Grid2x2<Boolean> g = new Grid2x2(
+        Grid2x2<Boolean> values = new Grid2x2(
                 edgeConstraints.getEdge(DottedSquare.SOUTH).getPixel(1),
                 edgeConstraints.getEdge(DottedSquare.EAST).getPixel(1),
                 edgeConstraints.getEdge(DottedSquare.NORTH).getPixel(1),
                 edgeConstraints.getEdge(DottedSquare.WEST).getPixel(1)
         );
         
-        return g.mapMarked((q, b) -> b ? createChild(q, null) : null);
+        return createChilds((s, oX, oY, p, n, q, v) -> v ?
+                             createChild(s, oX, oY, p, n, q, null) : null,
+                             values);
     }
     
     /**
      * A faster procedure for small squares.
      * @return A 2x2 grid of objects.
      */
-    public Grid2x2<CreationObject> split2x2()
+    public Grid2x2<PartialSquare> generate2x2()
     {
         assert (size == 2);
         
@@ -91,18 +104,19 @@ public abstract class CreationArea implements CreationObject
             southEdge.getPixel(0), southEdge.getPixel(1), southEdge.getPixel(2)
         );
                        
-        return values.split2x2().mapMarked((q, g) -> createChild(q, new DottedSquare(g)));
+        return createChilds((s, oX, oY, p, n, q, v) -> 
+                             createChild(s, oX, oY, p, n, q, new DottedSquare(v)),
+                             values.split2x2());
     }
     
     @Override
-    public Grid2x2<CreationObject> split(Grid2x2<IWorldSquare> childs,
-                                         Grid3x3<TileDataSummary> neighbors)
+    public Grid2x2<PartialSquare> generate()
     {
         if (size == 1)
-            return split1x1();
+            return generate1x1();
         
         if (size == 2)
-            return split2x2();
+            return generate2x2();
         
         assert(size % 2 == 0);
         int halfsize = size / 2;
@@ -156,26 +170,14 @@ public abstract class CreationArea implements CreationObject
         DottedLine eastPart1Edge = p.first;
         DottedLine eastPart2Edge = p.second;
         
-        Grid2x2<CreationObject> ret = new Grid2x2<>();
-        DottedSquare southeastQuarter = new DottedSquare(southPart2Edge, eastPart1Edge, eastCenterEdge.reverse(), southCenterEdge.reverse());
-        ret.southeast = createChild(Grid2x2.SOUTHEAST, southeastQuarter);
+        Grid2x2<DottedSquare> dottedSquares = new Grid2x2<>();
+        dottedSquares.southeast = new DottedSquare(southPart2Edge, eastPart1Edge, eastCenterEdge.reverse(), southCenterEdge.reverse());
+        dottedSquares.northeast = new DottedSquare(eastCenterEdge, eastPart2Edge, northPart1Edge, northCenterEdge.reverse());
+        dottedSquares.northwest = new DottedSquare(westCenterEdge, northCenterEdge, northPart2Edge, westPart1Edge);
+        dottedSquares.southwest = new DottedSquare(southPart1Edge, southCenterEdge, westCenterEdge.reverse(), westPart2Edge);        
         
-        DottedSquare northeastQuarter = new DottedSquare(eastCenterEdge, eastPart2Edge, northPart1Edge, northCenterEdge.reverse());
-        ret.northeast = createChild(Grid2x2.NORTHEAST, northeastQuarter);
-        
-        DottedSquare northwestQuarter = new DottedSquare(westCenterEdge, northCenterEdge, northPart2Edge, westPart1Edge);
-        ret.northwest = createChild(Grid2x2.NORTHWEST, northwestQuarter);
-        
-        DottedSquare southwestQuarter = new DottedSquare(southPart1Edge, southCenterEdge, westCenterEdge.reverse(), westPart2Edge);        
-        ret.southwest = createChild(Grid2x2.SOUTHWEST, southwestQuarter);
-        
-        ret = ret.map(s -> s.isAlive() ? s : null);
-        
-        return ret;
-    }
-
-    @Override
-    public void postProcess(WorldSquare sq, int x, int y)
-    {
+        return createChilds((s, oX, oY, pr, n, q, square) -> 
+                             createChild(s, oX, oY, pr, n, q, square),
+                             dottedSquares);
     }
 }

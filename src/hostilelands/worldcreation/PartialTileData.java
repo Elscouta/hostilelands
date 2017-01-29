@@ -13,26 +13,28 @@ import hostilelands.tools.CombineFunc;
  *
  * @author Elscouta
  */
-public class TileData
+public class PartialTileData
 {
-    private TerrainType terrain;
+    private TerrainType.Transform terrain;
     private MapLocation location;
     
-    public TileData()
+    public PartialTileData()
     {
-        terrain = TerrainType.SEA;
+        terrain = (t -> t);
         location = null;
     }
     
     public TerrainType getTerrainType()
     {
-        return terrain;
+        return terrain.apply(TerrainType.SEA);
     }
 
-    public void addTerrain(TerrainType other, boolean forceOverwrite)
+    public void setTerrain(TerrainType other, boolean forceOverwrite)
     {
-        if (forceOverwrite || other.canOverwrite(terrain))
-            terrain = other;
+        if (forceOverwrite)
+            terrain = (t -> other);
+        else
+            terrain = (t -> t != TerrainType.SEA ? other : t);
     }
     
     public void addLocation(MapLocation loc)
@@ -46,7 +48,15 @@ public class TileData
         return location;
     }
     
-    public static TileData combine(TileData o1, TileData o2)
+    public void overwrite(PartialTileData other)
+    {
+        final TerrainType.Transform myFunc = terrain;
+        final TerrainType.Transform otherFunc = other.terrain;
+        
+        terrain = (t -> otherFunc.apply(myFunc.apply(t)));
+    }
+
+    public static PartialTileData combine(PartialTileData o1, PartialTileData o2)
             throws CombineFunc.CombineFailure
     {
         if (o1 == null)
@@ -55,10 +65,13 @@ public class TileData
         if (o2 == null)
             return o1;
         
-        TileData o = new TileData();
-        o.terrain = CombineFunc.combineNullOrEqual(o1.terrain, o2.terrain);
+        PartialTileData o = new PartialTileData();
+        o.setTerrain( 
+                CombineFunc.combineNullOrEqual(o1.getTerrainType(), o2.getTerrainType()),
+                true
+        );
         o.location = CombineFunc.combineNull(o1.location, o2.location);
         
         return o;
-    }
+    }        
 }

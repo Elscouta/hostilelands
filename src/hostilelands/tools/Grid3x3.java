@@ -16,15 +16,15 @@ import java.util.function.Supplier;
  */
 public class Grid3x3<T> 
 {
-    public final T o11;
-    public final T o12;
-    public final T o13;
-    public final T o21;
-    public final T o22;
-    public final T o23;
-    public final T o31;
-    public final T o32;
-    public final T o33;
+    public T o11;
+    public T o12;
+    public T o13;
+    public T o21;
+    public T o22;
+    public T o23;
+    public T o31;
+    public T o32;
+    public T o33;
     
     public Grid3x3(T o11, T o12, T o13,
                    T o21, T o22, T o23,
@@ -40,6 +40,13 @@ public class Grid3x3<T>
         o11 = others.get(); o12 = others.get(); o13 = others.get();
         o21 = others.get(); o22 = center;       o23 = others.get();
         o31 = others.get(); o32 = others.get(); o33 = others.get();
+    }
+    
+    public Grid3x3(Grid3x3<T> other)
+    {
+        o11 = other.o11; o12 = other.o12; o13 = other.o13;
+        o21 = other.o21; o22 = other.o22; o23 = other.o23;
+        o31 = other.o31; o32 = other.o32; o33 = other.o33;
     }
     
     public Grid2x2<Grid2x2<T>> split2x2()
@@ -81,9 +88,9 @@ public class Grid3x3<T>
         return v;
     }
     
-    public Grid2x2<Grid3x3<T>> split3x3(Function<T, Grid2x2<T>> split)
+    public Grid2x2< Grid3x3<T> > split3x3(Function<T, Grid2x2<? extends T>> split)
     {
-        Grid3x3<Grid2x2<T>> sg = map(split);
+        Grid3x3< Grid2x2<? extends T> > sg = map(split);
         
         return new Grid2x2(
                 new Grid3x3(sg.o22.northwest, sg.o22.northeast, sg.o23.northwest,

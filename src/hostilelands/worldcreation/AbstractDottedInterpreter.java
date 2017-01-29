@@ -104,6 +104,8 @@ public abstract class AbstractDottedInterpreter implements DottedInterpreter
     @Override
     public double getExpectedRatio(double ratio)
     {
+        assert (ratio > - Settings.FLOAT_PRECISION &&
+                ratio < 1 + Settings.FLOAT_PRECISION);
         return ratio;
     }
 
